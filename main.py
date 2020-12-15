@@ -18,15 +18,14 @@ def get_db():
 def root():
     return {"message": "Hello World"}
 
-# Summarise a single position
 @app.get("/variants/{pos}")
-def list_position(pos, db: Session = Depends(get_db)):
-    return crud.summarise_records_by_position(db, pos)
-
-# Get sample names for variant(s) at a position
-@app.get("/samples/{pos}")
-def query_position(pos, varlist):
-    return {}
+def list_position(pos: int, db: Session = Depends(get_db), alts: str = None):
+    if alts:
+        # Get sample names for variant(s) at a position
+        return crud.samples_by_variantrecord(db, pos=pos, alts=alts.split(','))
+    else:
+        # Summarise a single position
+        return crud.summarise_records_by_position(db, pos)
 
 # Add to database
 @app.post("/variants/", response_model=schemas.VariantRecord)

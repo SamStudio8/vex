@@ -6,6 +6,9 @@ from . import models, schemas
 def summarise_records_by_position(db: Session, pos: int):
     return db.query(models.VariantRecord.alt, func.count(models.VariantRecord.alt)).filter(models.VariantRecord.position == pos).group_by(models.VariantRecord.alt).all()
 
+def samples_by_variantrecord(db: Session, pos: int, alts: list):
+    return db.query(models.VariantRecord).filter(models.VariantRecord.position == pos, models.VariantRecord.alt.in_(alts)).with_entities(models.VariantRecord.cogid, models.VariantRecord.alt).all()
+
 def create_variantrecord(db: Session, varr: schemas.VariantRecordCreate):
     varr_obj = models.VariantRecord(**varr.dict())
     db.add(varr_obj)
